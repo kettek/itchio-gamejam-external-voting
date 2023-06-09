@@ -1,0 +1,29 @@
+{{define "header"}}
+  <header class='top'>
+    <aside class='heading'>
+      <img src="{{.Image}}">
+      <span>
+        {{.Name}} Voting
+      </span>
+    </aside>
+    <aside class='auth'>
+      {{if .Authed}}
+        <form action="logout" method="POST">
+          <button method="POST">
+            Logout
+          </button>
+        </form>
+        <span>{{.User.Details.DisplayName}}</span>
+        <img src="{{.User.Details.ImageURL}}">
+      {{else}}
+        <form action="login" method="POST">
+          <button>
+            Login
+          </button>
+        </form>
+        <span></span>
+        <span></span>
+      {{end}}
+    </aside>
+  </header>
+{{end}}

@@ -1,0 +1,17 @@
+{{define "entry"}}
+  <a href='{{.Info.URL}}' target='_blank' class='entry__header'>
+    <img src="{{.Info.Cover}}">
+    <header>{{.Info.Title}}</header>
+  </a>
+  <aside>
+    by
+    {{if not .Contributors}}
+      <a href="{{.Info.User.URL}}" target="_blank">{{.Info.User.Name}}</a>
+    {{else}}
+      {{range .Contributors}}
+        <a href="{{.URL}}" target="_blank">{{.Name}}</a>
+      {{end}}
+    {{end}}
+  </aside>
+  <p>{{.Info.ShortText}}</p>
+{{end}}
