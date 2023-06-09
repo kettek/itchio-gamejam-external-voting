@@ -24,7 +24,7 @@ func loadTemplates() *template.Template {
 		"starSet": func(cat float64, v int) bool {
 			return cat >= float64(v)
 		},
-	}).ParseFiles("templates/index.gohtml", "templates/entry.gohtml", "templates/auth.gohtml", "templates/header.gohtml", "templates/results.gohtml")
+	}).ParseFiles("templates/index.gohtml", "templates/entry.gohtml", "templates/auth.gohtml", "templates/header.gohtml")
 	if err != nil {
 		panic(err)
 	}
