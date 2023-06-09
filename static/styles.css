@@ -24,6 +24,12 @@ body {
   z-index: 1;
 }
 
+form {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+}
+
 .entries {
   overflow: auto;
   display: flex;
