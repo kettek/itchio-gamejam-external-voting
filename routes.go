@@ -96,7 +96,10 @@ func setupRoutes() {
 		if err != nil {
 			// Clear out the key, as the auth must've been revoked.
 			if err == ErrNoUser || err == ErrBadKey {
-				session.GetSession(r).Set("key", nil)
+				s := session.GetSession(r)
+				if s != nil {
+					s.Set("key", nil)
+				}
 			}
 		} else {
 			authed = true
