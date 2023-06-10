@@ -65,9 +65,22 @@ func isOwnGame(user UserDetails, gameID int) bool {
 	return false
 }
 
+func gameExists(gameID int) bool {
+	for _, entry := range entries.Games {
+		if entry.ID == gameID {
+			return true
+		}
+	}
+	return false
+}
+
 func setVotes(user UserDetails, gameID int, votes Votes) error {
 	if isOwnGame(user, gameID) {
 		return ErrOwnGame
+	}
+
+	if !gameExists(gameID) {
+		return ErrMissingGame
 	}
 
 	err := db.Update(func(tx *bbolt.Tx) error {
