@@ -3,9 +3,42 @@
     <link rel="stylesheet" href="styles.css">
     <script src='shuffle.js'></script>
     <script src='vote.js'></script>
+    {{if .Admin}}
+      <script src='admin.js'></script>
+    {{end}}
   </head>
   <body>
     {{template "header" .}}
+    {{if .Admin}}
+      <section class='admin'>
+        <details class='admin__details'>
+          <summary>Admin</summary>
+          <label>
+            <span>ClientID</span>
+            <input name='ClientID' value={{.Config.ClientID}}>
+          </label>
+          <label>
+            <span>OAuth Redirect</span>
+            <input name='OAuthRedirect' value={{.Config.OAuthRedirect}}>
+          </label>
+          <hr>
+          <label>
+            <span>Game Jam</span>
+            <input name='GameJam' value={{.Config.GameJam}}>
+          </label>
+          <label>
+            <span>Voting Enabled</span>
+            <input name='VotingEnabled' type='checkbox'{{if .Config.VotingEnabled}} checked{{end}}>
+          </label>
+          <label>
+            <span>Voting Finished</span>
+            <input name='VotingFinished' type='checkbox'{{if .Config.VotingFinished}} checked{{end}}>
+          </label>
+        </details>
+      </section>
+    {{else}}
+      <section></section>
+    {{end}}
     <section class='entries'>
       {{range .Entries.Games}}
         <article class='entry' data-id={{.ID}}>

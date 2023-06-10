@@ -6,7 +6,7 @@ body {
   margin: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   height: 100%;
   width: 100%;
   background: #bbb;
@@ -28,6 +28,33 @@ form {
   display: flex;
   align-items: flex-end;
   height: 100%;
+}
+
+.admin {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin__details {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  width: 30em;
+  background: #eee;
+  border-radius: .5em;
+  box-shadow: 0 0 1em -.5em;
+  padding: .5em;
+  margin-top: 1em;
+}
+
+.admin label {
+  display: grid;
+  grid-template-columns: 20ch 30ch;
+  grid-template-rows: minmax(0, 1fr);
+  grid-gap: .5em;
+  width: 50ch;
 }
 
 .entries {

@@ -60,10 +60,19 @@ func getSessionKey(r *http.Request) string {
 	return key
 }
 
+func isAdmin(user User) bool {
+	for _, a := range c.Admins {
+		if a.Name == user.Details.DisplayName {
+			return true
+		}
+	}
+	return false
+}
+
 func setupRoutes() {
 	// Index and voting handling.
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		var authed bool
+		var authed, admin bool
 		key := getSessionKey(r)
 		user, err := getUserFromKey(key)
 		if err != nil {
@@ -82,6 +91,8 @@ func setupRoutes() {
 			}); err != nil {
 				log.Println("err", err)
 			}
+			// Set as admin if the user is in the admins slice.
+			admin = isAdmin(user)
 		}
 
 		if err := templates.ExecuteTemplate(w, "index.gohtml", struct {
@@ -89,9 +100,11 @@ func setupRoutes() {
 			Image          string
 			Entries        Entries
 			Authed         bool
+			Admin          bool
 			User           User
 			VotingEnabled  bool
 			VotingFinished bool
+			Config         Config
 		}{
 			Name:           c.GameJamName,
 			Image:          c.GameJamImage,
@@ -99,7 +112,9 @@ func setupRoutes() {
 			VotingFinished: c.VotingFinished,
 			Entries:        entries,
 			Authed:         authed,
+			Admin:          admin,
 			User:           user,
+			Config:         c,
 		}); err != nil {
 			panic(err)
 		}
@@ -140,6 +155,11 @@ func setupRoutes() {
 			return
 		}
 		user, err := getUserFromKey(key)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, err.Error())
+			return
+		}
 
 		// Get the previous votes for the given game.
 		votes, err := getVotes(user.Details, id)
@@ -239,6 +259,45 @@ func setupRoutes() {
 			Gameplay:   votes.Gameplay,
 			Theme:      votes.Theme,
 		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(b)
+	})
+
+	// Admin
+	r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+
+		key := getSessionKey(r)
+		if key == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "missing key")
+			return
+		}
+		user, err := getUserFromKey(key)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+
+		if !isAdmin(user) {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		for k, v := range q {
+			setConfig(k, v[0])
+		}
+		if err := saveConfig(); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Println(err)
+			return
+		}
+
+		b, err := json.Marshal(c)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
