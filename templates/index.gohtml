@@ -26,7 +26,7 @@
                   <header>Audio</header>
                   <section class='ratings__entry__stars' data-category='audio'>
                     {{range $v := iterate 5}}
-                      <a href='?id={{$ID}}&audio={{$v}}'>
+                      <a href='vote?id={{$ID}}&audio={{$v}}'>
                         {{if starSet $votes.Audio $v}} ★ {{else}} ☆ {{end}}
                       </a>
                     {{end}}
@@ -37,7 +37,7 @@
                   <header>Graphics</header>
                   <section class='ratings__entry__stars' data-category='graphics'>
                     {{range $v := iterate 5}}
-                      <a href='?id={{$ID}}&graphics={{$v}}'>
+                      <a href='vote?id={{$ID}}&graphics={{$v}}'>
                         {{if starSet $votes.Graphics $v}} ★ {{else}} ☆ {{end}}
                       </a>
                     {{end}}
@@ -48,7 +48,7 @@
                   <header>Innovation</header>
                   <section class='ratings__entry__stars' data-category='innovation'>
                     {{range $v := iterate 5}}
-                      <a href='?id={{$ID}}&innovation={{$v}}'>
+                      <a href='vote?id={{$ID}}&innovation={{$v}}'>
                         {{if starSet $votes.Innovation $v}} ★ {{else}} ☆ {{end}}
                       </a>
                     {{end}}
@@ -59,7 +59,7 @@
                   <header>Gameplay</header>
                   <section class='ratings__entry__stars' data-category='gameplay'>
                     {{range $v := iterate 5}}
-                      <a href='?id={{$ID}}&gameplay={{$v}}'>
+                      <a href='vote?id={{$ID}}&gameplay={{$v}}'>
                         {{if starSet $votes.Gameplay $v}} ★ {{else}} ☆ {{end}}
                       </a>
                     {{end}}
@@ -70,7 +70,7 @@
                   <header>Theme</header>
                   <section class='ratings__entry__stars' data-category='theme'>
                     {{range $v := iterate 5}}
-                      <a href='?id={{$ID}}&theme={{$v}}'>
+                      <a href='vote?id={{$ID}}&theme={{$v}}'>
                         {{if starSet $votes.Theme $v}} ★ {{else}} ☆ {{end}}
                       </a>
                     {{end}}

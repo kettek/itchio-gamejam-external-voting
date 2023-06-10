@@ -29,8 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
     for (let l of links) {
       l.addEventListener('click', async e => {
         e.preventDefault()
-        let u = new URL(l.href)
-        const res = await fetch(`${u.origin}/vote${u.search}`)
+        const res = await fetch(l.href)
         if (res.status == 200) {
           const votes = await res.json()
           setGameVotes(votes)
