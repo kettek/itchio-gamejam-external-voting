@@ -64,6 +64,9 @@ func getUserFromKey(key string) (User, error) {
 
 func getSessionKey(r *http.Request) string {
 	s := session.GetSession(r)
+	if s == nil {
+		return ""
+	}
 	var key string
 	switch v := s.Get("key").(type) {
 	case string:
