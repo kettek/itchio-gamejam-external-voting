@@ -1,9 +1,13 @@
 {{define "header"}}
   <header class='top'>
     <aside class='heading'>
-      <img src="{{.Image}}">
+      <a href="https://itch.io/jam/{{.Config.GameJam}}" target="_blank">
+        <img src="{{.Image}}">
+      </a>
       <span>
-        {{.Name}} Voting
+        <a href="https://itch.io/jam/{{.Config.GameJam}}" target="_blank">
+          {{.Name}} Voting
+        </a>
       </span>
     </aside>
     <aside class='auth'>
