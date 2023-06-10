@@ -57,6 +57,10 @@ form {
   width: 50ch;
 }
 
+.admin label span {
+  text-decoration: underline dotted;
+}
+
 .entries {
   overflow: auto;
   display: flex;

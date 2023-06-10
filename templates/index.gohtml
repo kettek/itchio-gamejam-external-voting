@@ -11,27 +11,27 @@
     {{template "header" .}}
     {{if .Admin}}
       <section class='admin'>
-        <details class='admin__details'>
+        <details class='admin__details' open>
           <summary>Admin</summary>
           <label>
-            <span>ClientID</span>
+            <span title='ClientID for the OAuth app'>ClientID</span>
             <input name='ClientID' value={{.Config.ClientID}}>
           </label>
           <label>
-            <span>OAuth Redirect</span>
+            <span title='OAuth redirect/callback URL from the OAuth app'>OAuth Redirect</span>
             <input name='OAuthRedirect' value={{.Config.OAuthRedirect}}>
           </label>
           <hr>
           <label>
-            <span>Game Jam</span>
+            <span title='Game jam, derived from jam URL. Refresh page after changing'>Game Jam</span>
             <input name='GameJam' value={{.Config.GameJam}}>
           </label>
           <label>
-            <span>Voting Enabled</span>
+            <span title='Enable/disable user voting'>Voting Enabled</span>
             <input name='VotingEnabled' type='checkbox'{{if .Config.VotingEnabled}} checked{{end}}>
           </label>
           <label>
-            <span>Voting Finished</span>
+            <span title='Prevent further voting and show average results'>Voting Finished</span>
             <input name='VotingFinished' type='checkbox'{{if .Config.VotingFinished}} checked{{end}}>
           </label>
         </details>
