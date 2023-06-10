@@ -43,10 +43,11 @@ form {
   align-items: center;
   width: 30em;
   background: #eee;
-  border-radius: .5em;
-  box-shadow: 0 0 1em -.5em;
+  border-radius: 0 0 .5em .5em;
+  box-shadow: 0 0.5em 0.5em -.5em;
   padding: .5em;
-  margin-top: 1em;
+  margin-bottom: 1em;
+  z-index: 2;
 }
 
 .admin label {
