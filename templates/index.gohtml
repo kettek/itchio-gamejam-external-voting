@@ -27,11 +27,11 @@
             <input name='GameJam' value={{.Config.GameJam}}>
           </label>
           <label>
-            <span title='Enable/disable user voting'>Voting Enabled</span>
+            <span title='Enable/disable user voting. Refresh page after changing.'>Voting Enabled</span>
             <input name='VotingEnabled' type='checkbox'{{if .Config.VotingEnabled}} checked{{end}}>
           </label>
           <label>
-            <span title='Prevent further voting and show average results'>Voting Finished</span>
+            <span title='Prevent further voting and show average results. Refresh page after changing.'>Voting Finished</span>
             <input name='VotingFinished' type='checkbox'{{if .Config.VotingFinished}} checked{{end}}>
           </label>
         </details>
