@@ -21,6 +21,9 @@ var ErrMissingQueryParam = errors.New("missing query param")
 // ErrBadUser is returned when a given key cannot be used to get a user.
 var ErrBadUser = errors.New("no such user for key")
 
+// ErrBadKey is returned when a given key is invalid for itch.io
+var ErrBadKey = errors.New("invalid key")
+
 // ErrNoUser is returned when a given key has no user available.
 var ErrNoUser = errors.New("no such user for key")
 
@@ -40,7 +43,16 @@ func getUserFromKey(key string) (User, error) {
 			if err != nil {
 				return user, errors.Join(ErrBadUser, err)
 			}
-			// It should be JSON.
+			// Check for itch.io error first.
+			itchErr := struct {
+				Errors []string
+			}{}
+			if err := json.Unmarshal(resBody, &itchErr); err == nil {
+				if len(itchErr.Errors) > 0 {
+					return user, errors.Join(ErrBadKey, err)
+				}
+			}
+			// Now try to read the user!
 			if err := json.Unmarshal(resBody, &user); err != nil {
 				return user, errors.Join(ErrBadUser, err)
 			}
@@ -82,9 +94,8 @@ func setupRoutes() {
 		key := getSessionKey(r)
 		user, err := getUserFromKey(key)
 		if err != nil {
-			log.Println(err)
 			// Clear out the key, as the auth must've been revoked.
-			if err != ErrNoUser {
+			if err == ErrNoUser || err == ErrBadKey {
 				session.GetSession(r).Set("key", nil)
 			}
 		} else {
