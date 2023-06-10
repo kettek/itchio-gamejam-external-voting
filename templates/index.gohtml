@@ -1,86 +1,88 @@
-<head>
-  <link rel="stylesheet" href="styles.css">
-  <script src='shuffle.js'></script>
-  <script src='vote.js'></script>
-</head>
-<body>
-  {{template "header" .}}
-  <section class='entries'>
-    {{range .Entries.Games}}
-      <article class='entry' data-id={{.ID}}>
-        {{template "entry" .}}
-        {{if (and (not $.VotingFinished) (not $.Authed))}}
-          Login to vote!
-        {{else if or $.VotingFinished $.VotingEnabled}}
-          {{$votes := ""}}
-          {{if $.VotingFinished}}
-            {{$votes = getFinalVotes .ID}}
+<!DOCTYPE html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+    <script src='shuffle.js'></script>
+    <script src='vote.js'></script>
+  </head>
+  <body>
+    {{template "header" .}}
+    <section class='entries'>
+      {{range .Entries.Games}}
+        <article class='entry' data-id={{.ID}}>
+          {{template "entry" .}}
+          {{if (and (not $.VotingFinished) (not $.Authed))}}
+            Login to vote!
+          {{else if or $.VotingFinished $.VotingEnabled}}
+            {{$votes := ""}}
+            {{if $.VotingFinished}}
+              {{$votes = getFinalVotes .ID}}
+            {{else}}
+              {{$votes = getVotes $.User.Details .ID}}
+            {{end}}
+            {{$ID := .ID}}
+            {{if or (and $.VotingEnabled (not (isOwnGame $.User.Details .ID))) $.VotingFinished}}
+              <section class='ratings'>
+                <article class='ratings__entry'>
+                  <header>Audio</header>
+                  <section class='ratings__entry__stars' data-category='audio'>
+                    {{range $v := iterate 5}}
+                      <a href='?id={{$ID}}&audio={{$v}}'>
+                        {{if starSet $votes.Audio $v}} ★ {{else}} ☆ {{end}}
+                      </a>
+                    {{end}}
+                  </section>
+                  <span class='ratings__entry__number' data-category='audio'>{{$votes.Audio}}</span>
+                </article>
+                <article class='ratings__entry'>
+                  <header>Graphics</header>
+                  <section class='ratings__entry__stars' data-category='graphics'>
+                    {{range $v := iterate 5}}
+                      <a href='?id={{$ID}}&graphics={{$v}}'>
+                        {{if starSet $votes.Graphics $v}} ★ {{else}} ☆ {{end}}
+                      </a>
+                    {{end}}
+                  </section>
+                  <span class='ratings__entry__number' data-category='graphics'>{{$votes.Graphics}}</span>
+                </article>
+                <article class='ratings__entry'>
+                  <header>Innovation</header>
+                  <section class='ratings__entry__stars' data-category='innovation'>
+                    {{range $v := iterate 5}}
+                      <a href='?id={{$ID}}&innovation={{$v}}'>
+                        {{if starSet $votes.Innovation $v}} ★ {{else}} ☆ {{end}}
+                      </a>
+                    {{end}}
+                  </section>
+                  <span class='ratings__entry__number' data-category='innovation'>{{$votes.Innovation}}</span>
+                </article>
+                <article class='ratings__entry'>
+                  <header>Gameplay</header>
+                  <section class='ratings__entry__stars' data-category='gameplay'>
+                    {{range $v := iterate 5}}
+                      <a href='?id={{$ID}}&gameplay={{$v}}'>
+                        {{if starSet $votes.Gameplay $v}} ★ {{else}} ☆ {{end}}
+                      </a>
+                    {{end}}
+                  </section>
+                  <span class='ratings__entry__number' data-category='gameplay'>{{$votes.Gameplay}}</span>
+                </article>
+                <article class='ratings__entry'>
+                  <header>Theme</header>
+                  <section class='ratings__entry__stars' data-category='theme'>
+                    {{range $v := iterate 5}}
+                      <a href='?id={{$ID}}&theme={{$v}}'>
+                        {{if starSet $votes.Theme $v}} ★ {{else}} ☆ {{end}}
+                      </a>
+                    {{end}}
+                  </section>
+                  <span class='ratings__entry__number' data-category='theme'>{{$votes.Theme}}</span>
+                </article>
+              </section>
+            {{end}}
           {{else}}
-            {{$votes = getVotes $.User.Details .ID}}
           {{end}}
-          {{$ID := .ID}}
-          {{if or (and $.VotingEnabled (not (isOwnGame $.User.Details .ID))) $.VotingFinished}}
-            <section class='ratings'>
-              <article class='ratings__entry'>
-                <header>Audio</header>
-                <section class='ratings__entry__stars' data-category='audio'>
-                  {{range $v := iterate 5}}
-                    <a href='?id={{$ID}}&audio={{$v}}'>
-                      {{if starSet $votes.Audio $v}} ★ {{else}} ☆ {{end}}
-                    </a>
-                  {{end}}
-                </section>
-                <span class='ratings__entry__number' data-category='audio'>{{$votes.Audio}}</span>
-              </article>
-              <article class='ratings__entry'>
-                <header>Graphics</header>
-                <section class='ratings__entry__stars' data-category='graphics'>
-                  {{range $v := iterate 5}}
-                    <a href='?id={{$ID}}&graphics={{$v}}'>
-                      {{if starSet $votes.Graphics $v}} ★ {{else}} ☆ {{end}}
-                    </a>
-                  {{end}}
-                </section>
-                <span class='ratings__entry__number' data-category='graphics'>{{$votes.Graphics}}</span>
-              </article>
-              <article class='ratings__entry'>
-                <header>Innovation</header>
-                <section class='ratings__entry__stars' data-category='innovation'>
-                  {{range $v := iterate 5}}
-                    <a href='?id={{$ID}}&innovation={{$v}}'>
-                      {{if starSet $votes.Innovation $v}} ★ {{else}} ☆ {{end}}
-                    </a>
-                  {{end}}
-                </section>
-                <span class='ratings__entry__number' data-category='innovation'>{{$votes.Innovation}}</span>
-              </article>
-              <article class='ratings__entry'>
-                <header>Gameplay</header>
-                <section class='ratings__entry__stars' data-category='gameplay'>
-                  {{range $v := iterate 5}}
-                    <a href='?id={{$ID}}&gameplay={{$v}}'>
-                      {{if starSet $votes.Gameplay $v}} ★ {{else}} ☆ {{end}}
-                    </a>
-                  {{end}}
-                </section>
-                <span class='ratings__entry__number' data-category='gameplay'>{{$votes.Gameplay}}</span>
-              </article>
-              <article class='ratings__entry'>
-                <header>Theme</header>
-                <section class='ratings__entry__stars' data-category='theme'>
-                  {{range $v := iterate 5}}
-                    <a href='?id={{$ID}}&theme={{$v}}'>
-                      {{if starSet $votes.Theme $v}} ★ {{else}} ☆ {{end}}
-                    </a>
-                  {{end}}
-                </section>
-                <span class='ratings__entry__number' data-category='theme'>{{$votes.Theme}}</span>
-              </article>
-            </section>
-          {{end}}
-        {{else}}
-        {{end}}
-      </article>
-    {{end}}
-  </section>
-</body>
+        </article>
+      {{end}}
+    </section>
+  </body>
+</html>
