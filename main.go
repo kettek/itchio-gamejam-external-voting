@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"gitea.com/go-chi/session"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	bolt "go.etcd.io/bbolt"
 )
 

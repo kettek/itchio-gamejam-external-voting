@@ -64,9 +64,6 @@ func getUserFromKey(key string) (User, error) {
 
 func getSessionKey(r *http.Request) string {
 	s := session.GetSession(r)
-	if s == nil {
-		return ""
-	}
 	var key string
 	switch v := s.Get("key").(type) {
 	case string:
@@ -98,11 +95,8 @@ func setupRoutes() {
 		user, err := getUserFromKey(key)
 		if err != nil {
 			// Clear out the key, as the auth must've been revoked.
-			if err == ErrNoUser || err == ErrBadKey {
-				s := session.GetSession(r)
-				if s != nil {
-					s.Set("key", nil)
-				}
+			if err == ErrBadUser || err == ErrBadKey {
+				session.GetSession(r).Set("key", nil)
 			}
 		} else {
 			authed = true
