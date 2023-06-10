@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	bolt "go.etcd.io/bbolt"
 )
@@ -19,7 +18,7 @@ func loadDB() *bolt.DB {
 		dbName = "default"
 	}
 
-	if err := os.MkdirAll(filepath.Dir(dbPath), 0770); err != nil {
+	if err := os.MkdirAll(dbPath, 0770); err != nil {
 		panic(err)
 	}
 
