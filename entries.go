@@ -19,6 +19,7 @@ type UserDetails struct {
 	ImageURL    string `json:"cover_url"`
 	DisplayName string `json:"display_name"`
 	UserName    string `json:"username"`
+	URL         string `json:"url"`
 }
 
 // Entries is the main entries struct returned from itch.io

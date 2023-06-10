@@ -142,7 +142,7 @@ func setupRoutes() {
 		user, err := getUserFromKey(key)
 
 		// Get the previous votes for the given game.
-		votes, err := getVotes(user.Details.ID, id)
+		votes, err := getVotes(user.Details, id)
 		if err != nil {
 			if err != ErrMissingGame {
 				w.WriteHeader(http.StatusBadRequest)
@@ -217,7 +217,7 @@ func setupRoutes() {
 			votes.Theme = theme
 		}
 
-		if err := setVotes(user.Details.ID, id, votes); err != nil {
+		if err := setVotes(user.Details, id, votes); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprintf(w, err.Error())
 			return

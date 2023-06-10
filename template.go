@@ -10,8 +10,8 @@ func loadTemplates() *template.Template {
 			votes, _ := getFinalVotes(id)
 			return votes
 		},
-		"getVotes": func(userID int, id int) Votes {
-			votes, _ := getVotes(userID, id)
+		"getVotes": func(user UserDetails, id int) Votes {
+			votes, _ := getVotes(user, id)
 			return votes
 		},
 		"iterate": func(count int) []int {
@@ -23,6 +23,9 @@ func loadTemplates() *template.Template {
 		},
 		"starSet": func(cat float64, v int) bool {
 			return cat >= float64(v)
+		},
+		"isOwnGame": func(user UserDetails, id int) bool {
+			return isOwnGame(user, id)
 		},
 	}).ParseFiles("templates/index.gohtml", "templates/entry.gohtml", "templates/auth.gohtml", "templates/header.gohtml")
 	if err != nil {
