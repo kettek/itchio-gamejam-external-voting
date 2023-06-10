@@ -62,7 +62,13 @@ func getSessionKey(r *http.Request) string {
 
 func isAdmin(user User) bool {
 	for _, a := range c.Admins {
-		if a.Name == user.Details.DisplayName {
+		if a.ID != 0 && a.ID == user.Details.ID {
+			return true
+		}
+		if a.URL != "" && a.URL == user.Details.URL {
+			return true
+		}
+		if a.Name != "" && a.Name == user.Details.DisplayName {
 			return true
 		}
 	}
