@@ -151,6 +151,11 @@ func setupRoutes() {
 
 	// Voting handling
 	r.Get("/vote", func(w http.ResponseWriter, r *http.Request) {
+		if !c.VotingEnabled {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting disabled")
+			return
+		}
 		if c.VotingFinished {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, "voting finished")
