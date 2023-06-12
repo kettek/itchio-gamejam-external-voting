@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -59,11 +61,13 @@ func loadConfig() Config {
 
 	c2 := config
 	config.original = &c2
+	copy(config.original.VoteCategories, config.VoteCategories)
+	copy(config.original.Admins, config.Admins)
 
 	return config
 }
 
-func setConfig(key string, value string) {
+func setConfig(key string, value string) error {
 	switch key {
 	case "ClientID":
 		c.ClientID = value
@@ -93,7 +97,45 @@ func setConfig(key string, value string) {
 			c.VotingEnabled = false
 		}
 		c.original.VotingEnabled = c.VotingEnabled
+	case "AddVoteCategory":
+		c.VoteCategories = append(c.VoteCategories, value)
+		c.original.VoteCategories = append(c.original.VoteCategories, value)
+	case "RemoveVoteCategory":
+		if strings.HasPrefix(value, "VoteCategories-") {
+			parts := strings.Split(value, "-")
+			if len(parts) != 2 {
+				return errors.New("bad vote index")
+			}
+			i, err := strconv.Atoi(parts[1])
+			if err != nil {
+				return errors.New("bad vote index")
+			}
+			if i < 0 || i >= len(c.VoteCategories) {
+				return errors.New("bad vote index")
+			}
+			c.VoteCategories = append(c.VoteCategories[:i], c.VoteCategories[i+1:]...)
+			c.original.VoteCategories = append(c.original.VoteCategories[:i], c.original.VoteCategories[i+1:]...)
+		}
+	default:
+		if strings.HasPrefix(key, "VoteCategories-") {
+			parts := strings.Split(key, "-")
+			if len(parts) != 2 {
+				return errors.New("bad vote index")
+			}
+			i, err := strconv.Atoi(parts[1])
+			if err != nil {
+				return errors.New("bad vote index")
+			}
+			if i < 0 || i >= len(c.VoteCategories) {
+				return errors.New("bad vote index")
+			}
+			c.VoteCategories[i] = value
+			c.original.VoteCategories[i] = value
+		} else {
+			return errors.New("no such key in config")
+		}
 	}
+	return nil
 }
 
 func saveConfig() error {

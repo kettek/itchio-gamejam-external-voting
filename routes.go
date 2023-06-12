@@ -268,7 +268,12 @@ func setupRoutes() {
 		}
 
 		for k, v := range q {
-			setConfig(k, v[0])
+			err := setConfig(k, v[0])
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Println(err)
+				return
+			}
 		}
 		if err := saveConfig(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
