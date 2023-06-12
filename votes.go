@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"math"
 	"strconv"
 
 	"go.etcd.io/bbolt"
@@ -138,6 +139,10 @@ func getFinalVotes(gameID int) (Votes, error) {
 
 	for k, v := range voteCounts {
 		votes[k] /= v
+	}
+
+	for k, v := range votes {
+		votes[k] = math.Round(v*100) / 100
 	}
 
 	return votes, err
