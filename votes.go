@@ -9,33 +9,23 @@ import (
 )
 
 // Votes are the votes as stored in the DB.
-type Votes struct {
-	Audio      float64 `json:"audio"`
-	Graphics   float64 `json:"graphics"`
-	Innovation float64 `json:"innovation"`
-	Gameplay   float64 `json:"gameplay"`
-	Theme      float64 `json:"theme"`
-}
+type Votes map[string]float64
 
 // Add adds the passed vote's category values to this one.
-func (v *Votes) Add(o Votes) {
-	v.Audio += o.Audio
-	v.Graphics += o.Graphics
-	v.Innovation += o.Innovation
-	v.Gameplay += o.Gameplay
-	v.Theme += o.Theme
+func (votes Votes) Add(o Votes) {
+	for k, v := range o {
+		votes[k] += v
+	}
 }
 
 // DivideBy divides all the vote categories by the given count.
-func (v *Votes) DivideBy(c float64) {
+func (votes Votes) DivideBy(c float64) {
 	if c == 0 {
 		return
 	}
-	v.Audio /= c
-	v.Graphics /= c
-	v.Innovation /= c
-	v.Gameplay /= c
-	v.Theme /= c
+	for k := range votes {
+		votes[k] /= c
+	}
 }
 
 // ErrMissingBucket is returned when a user bucket attempting to be accessed is missing.
@@ -101,7 +91,7 @@ func setVotes(user UserDetails, gameID int, votes Votes) error {
 }
 
 func getVotes(user UserDetails, gameID int) (Votes, error) {
-	var votes Votes
+	votes := make(Votes)
 	err := db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(strconv.Itoa(user.ID)))
 		if b == nil {
@@ -121,8 +111,8 @@ func getVotes(user UserDetails, gameID int) (Votes, error) {
 }
 
 func getFinalVotes(gameID int) (Votes, error) {
-	var votes Votes
-	var count float64
+	votes := make(Votes)
+	voteCounts := make(map[string]float64)
 	err := db.View(func(tx *bbolt.Tx) error {
 		return tx.ForEach(func(name []byte, b *bbolt.Bucket) error {
 			var userVotes Votes
@@ -136,13 +126,19 @@ func getFinalVotes(gameID int) (Votes, error) {
 			}
 
 			votes.Add(userVotes)
-			count++
+			for k, v := range votes {
+				if v > 0 {
+					voteCounts[k]++
+				}
+			}
 
 			return nil
 		})
 	})
 
-	votes.DivideBy(count)
+	for k, v := range voteCounts {
+		votes[k] /= v
+	}
 
 	return votes, err
 }

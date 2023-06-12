@@ -151,14 +151,14 @@ func setupRoutes() {
 
 	// Voting handling
 	r.Get("/vote", func(w http.ResponseWriter, r *http.Request) {
-		if !c.VotingEnabled {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintf(w, "voting disabled")
-			return
-		}
 		if c.VotingFinished {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, "voting finished")
+			return
+		}
+		if !c.VotingEnabled {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting disabled")
 			return
 		}
 
@@ -212,51 +212,16 @@ func setupRoutes() {
 			return v, nil
 		}
 
-		// TODO: Use a map or something.
-		audio, err := getNum("audio")
-		if err != nil {
-			if err != ErrMissingQueryParam {
-				w.WriteHeader(http.StatusBadRequest)
-				return
+		for _, cat := range c.VoteCategories {
+			v, err := getNum(cat)
+			if err != nil {
+				if err != ErrMissingQueryParam {
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				}
+			} else {
+				votes[cat] = v
 			}
-		} else {
-			votes.Audio = audio
-		}
-		graphics, err := getNum("graphics")
-		if err != nil {
-			if err != ErrMissingQueryParam {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-		} else {
-			votes.Graphics = graphics
-		}
-		innovation, err := getNum("innovation")
-		if err != nil {
-			if err != ErrMissingQueryParam {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-		} else {
-			votes.Innovation = innovation
-		}
-		gameplay, err := getNum("gameplay")
-		if err != nil {
-			if err != ErrMissingQueryParam {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-		} else {
-			votes.Gameplay = gameplay
-		}
-		theme, err := getNum("theme")
-		if err != nil {
-			if err != ErrMissingQueryParam {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-		} else {
-			votes.Theme = theme
 		}
 
 		if err := setVotes(user.Details, id, votes); err != nil {
@@ -267,19 +232,11 @@ func setupRoutes() {
 
 		// Return JSON with the user's current votes.
 		b, err := json.Marshal(struct {
-			ID         int     `json:"id"`
-			Audio      float64 `json:"audio"`
-			Graphics   float64 `json:"graphics"`
-			Innovation float64 `json:"innovation"`
-			Gameplay   float64 `json:"gameplay"`
-			Theme      float64 `json:"theme"`
+			ID    int                `json:"id"`
+			Votes map[string]float64 `json:"votes"`
 		}{
-			ID:         id,
-			Audio:      votes.Audio,
-			Graphics:   votes.Graphics,
-			Innovation: votes.Innovation,
-			Gameplay:   votes.Gameplay,
-			Theme:      votes.Theme,
+			ID:    id,
+			Votes: votes,
 		})
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

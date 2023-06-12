@@ -19,6 +19,7 @@ type Config struct {
 	OAuthRedirect  string
 	VotingEnabled  bool
 	VotingFinished bool
+	VoteCategories []string
 	Admins         []UserInfo `json:",omitempty"`
 }
 

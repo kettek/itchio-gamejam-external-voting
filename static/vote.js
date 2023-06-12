@@ -4,10 +4,10 @@ window.addEventListener('DOMContentLoaded', () => {
     for (let entry of entries) {
       if (entry.dataset['id'] == o.id) {
         for (let category of entry.getElementsByClassName('ratings__entry__stars')) {
-          if (!o[category.dataset['category']]) continue
+          if (!o.votes[category.dataset['category']]) continue
           let anchors = category.getElementsByTagName('a')
           for (let i = 0; i < anchors.length; i++) {
-            if (i < o[category.dataset['category']]) {
+            if (i < o.votes[category.dataset['category']]) {
               anchors[i].innerHTML = '★'
             } else {
               anchors[i].innerHTML = '☆'
@@ -15,8 +15,8 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         }
         for (let number of entry.getElementsByClassName('ratings__entry__number')) {
-          if (!o[number.dataset['category']]) continue
-          number.innerHTML = o[number.dataset['category']]
+          if (!o.votes[number.dataset['category']]) continue
+          number.innerHTML = o.votes[number.dataset['category']]
         }
         return
       }
