@@ -26,6 +26,21 @@
             <span title='Game jam, derived from jam URL. Refresh page after changing'>Game Jam</span>
             <input name='GameJam' value={{.Config.GameJam}}>
           </label>
+          <hr>
+          <label>
+            <span title='Reload after adding or removing categories to refresh entries.'>Voting Categories</span>
+          </label>
+          {{range $index, $category := .Config.VoteCategories}}
+            <span class='voteCategory'>
+              <input class='VoteCategories' name='VoteCategories-{{$index}}' value={{.}}>
+              <button class='RemoveVoteCategory'>Remove</button>
+            </span>
+          {{end}}
+          <span>
+            <input id='NewVoteCategory' name='NewVoteCategory'>
+            <button id='AddVoteCategory'>Add Category</button>
+          </span>
+          <hr>
           <label>
             <span title='Enable/disable user voting. Refresh page after changing.'>Voting Enabled</span>
             <input name='VotingEnabled' type='checkbox'{{if .Config.VotingEnabled}} checked{{end}}>
@@ -55,61 +70,24 @@
             {{$ID := .ID}}
             {{if or (and $.VotingEnabled (not (isOwnGame $.User.Details .ID))) $.VotingFinished}}
               <section class='ratings'>
-                <article class='ratings__entry'>
-                  <header>Audio</header>
-                  <section class='ratings__entry__stars' data-category='audio'>
-                    {{range $v := iterate 5}}
-                      <a href='vote?id={{$ID}}&audio={{$v}}'>
-                        {{if starSet $votes.Audio $v}} ★ {{else}} ☆ {{end}}
-                      </a>
-                    {{end}}
-                  </section>
-                  <span class='ratings__entry__number' data-category='audio'>{{$votes.Audio}}</span>
-                </article>
-                <article class='ratings__entry'>
-                  <header>Graphics</header>
-                  <section class='ratings__entry__stars' data-category='graphics'>
-                    {{range $v := iterate 5}}
-                      <a href='vote?id={{$ID}}&graphics={{$v}}'>
-                        {{if starSet $votes.Graphics $v}} ★ {{else}} ☆ {{end}}
-                      </a>
-                    {{end}}
-                  </section>
-                  <span class='ratings__entry__number' data-category='graphics'>{{$votes.Graphics}}</span>
-                </article>
-                <article class='ratings__entry'>
-                  <header>Innovation</header>
-                  <section class='ratings__entry__stars' data-category='innovation'>
-                    {{range $v := iterate 5}}
-                      <a href='vote?id={{$ID}}&innovation={{$v}}'>
-                        {{if starSet $votes.Innovation $v}} ★ {{else}} ☆ {{end}}
-                      </a>
-                    {{end}}
-                  </section>
-                  <span class='ratings__entry__number' data-category='innovation'>{{$votes.Innovation}}</span>
-                </article>
-                <article class='ratings__entry'>
-                  <header>Gameplay</header>
-                  <section class='ratings__entry__stars' data-category='gameplay'>
-                    {{range $v := iterate 5}}
-                      <a href='vote?id={{$ID}}&gameplay={{$v}}'>
-                        {{if starSet $votes.Gameplay $v}} ★ {{else}} ☆ {{end}}
-                      </a>
-                    {{end}}
-                  </section>
-                  <span class='ratings__entry__number' data-category='gameplay'>{{$votes.Gameplay}}</span>
-                </article>
-                <article class='ratings__entry'>
-                  <header>Theme</header>
-                  <section class='ratings__entry__stars' data-category='theme'>
-                    {{range $v := iterate 5}}
-                      <a href='vote?id={{$ID}}&theme={{$v}}'>
-                        {{if starSet $votes.Theme $v}} ★ {{else}} ☆ {{end}}
-                      </a>
-                    {{end}}
-                  </section>
-                  <span class='ratings__entry__number' data-category='theme'>{{$votes.Theme}}</span>
-                </article>
+                {{range $.Config.VoteCategories}}
+                  {{$key := .}}
+                  {{$value := 0.0}}
+                  {{if index $votes $key}}
+                    {{$value = index $votes $key}}
+                  {{end}}
+                  <article class='ratings__entry'>
+                    <header>{{$key}}</header>
+                    <section class='ratings__entry__stars' data-category='{{$key}}'>
+                      {{range $v := iterate 5}}
+                        <a href='vote?id={{$ID}}&{{$key}}={{$v}}'>
+                          {{if starSet $value $v}} ★ {{else}} ☆ {{end}}
+                        </a>
+                      {{end}}
+                    </section>
+                    <span class='ratings__entry__number' data-category='{{$key}}'>{{$value}}</span>
+                  </article>
+                {{end}}
               </section>
             {{end}}
           {{else}}
