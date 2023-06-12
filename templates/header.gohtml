@@ -6,7 +6,12 @@
       </a>
       <span>
         <a href="https://itch.io/jam/{{.Config.GameJam}}" target="_blank">
-          {{.Name}} Voting
+          {{.Name}}
+          {{if .Config.VotingFinished}}
+            Results
+          {{else if .Config.VotingEnabled}}
+            Voting
+          {{end}}
         </a>
       </span>
     </aside>
