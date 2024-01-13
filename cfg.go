@@ -22,6 +22,8 @@ type Config struct {
 	VotingEnabled  bool
 	VotingFinished bool
 	VoteCategories []string
+	Badges         []string
+	UniqueBadges   []string
 	Admins         []UserInfo `json:",omitempty"`
 }
 
@@ -115,6 +117,44 @@ func setConfig(key string, value string) error {
 			}
 			c.VoteCategories = append(c.VoteCategories[:i], c.VoteCategories[i+1:]...)
 			c.original.VoteCategories = append(c.original.VoteCategories[:i], c.original.VoteCategories[i+1:]...)
+		}
+	case "AddBadge":
+		c.Badges = append(c.Badges, value)
+		c.original.Badges = append(c.original.Badges, value)
+	case "RemoveBadge":
+		if strings.HasPrefix(value, "Badges-") {
+			parts := strings.Split(value, "-")
+			if len(parts) != 2 {
+				return errors.New("bad badge index")
+			}
+			i, err := strconv.Atoi(parts[1])
+			if err != nil {
+				return errors.New("bad badge index")
+			}
+			if i < 0 || i >= len(c.Badges) {
+				return errors.New("bad badge index")
+			}
+			c.Badges = append(c.Badges[:i], c.Badges[i+1:]...)
+			c.original.Badges = append(c.original.Badges[:i], c.original.Badges[i+1:]...)
+		}
+	case "AddUniqueBadge":
+		c.UniqueBadges = append(c.UniqueBadges, value)
+		c.original.UniqueBadges = append(c.original.UniqueBadges, value)
+	case "RemoveUniqueBadge":
+		if strings.HasPrefix(value, "UniqueBadges-") {
+			parts := strings.Split(value, "-")
+			if len(parts) != 2 {
+				return errors.New("bad unique badge index")
+			}
+			i, err := strconv.Atoi(parts[1])
+			if err != nil {
+				return errors.New("bad unique badge index")
+			}
+			if i < 0 || i >= len(c.UniqueBadges) {
+				return errors.New("bad unique badge index")
+			}
+			c.UniqueBadges = append(c.UniqueBadges[:i], c.UniqueBadges[i+1:]...)
+			c.original.UniqueBadges = append(c.original.UniqueBadges[:i], c.original.UniqueBadges[i+1:]...)
 		}
 	default:
 		if strings.HasPrefix(key, "VoteCategories-") {

@@ -41,6 +41,28 @@
             <button id='AddVoteCategory'>Add Category</button>
           </span>
           <hr>
+          {{range $index, $category := .Config.Badges}}
+            <span class='badge'>
+              <input class='Badges' name='Badges-{{$index}}' value={{.}}>
+              <button class='RemoveBadge'>Remove Badge</button>
+            </span>
+          {{end}}
+          <span>
+            <input id='NewBadge' name='NewBadge'>
+            <button id='AddBadge'>Add Badge</button>
+          </span>
+          <hr>
+          {{range $index, $category := .Config.UniqueBadges}}
+            <span class='uniqueBadge'>
+              <input class='UniqueBadges' name='UniqueBadges-{{$index}}' value={{.}}>
+              <button class='RemoveUniqueBadge'>Remove Unique</button>
+            </span>
+          {{end}}
+          <span>
+            <input id='NewUniqueBadge' name='NewUniqueBadge'>
+            <button id='AddUniqueBadge'>Add Unique Badge</button>
+          </span>
+          <hr>
           <label>
             <span title='Enable/disable user voting. Refresh page after changing.'>Voting Enabled</span>
             <input name='VotingEnabled' type='checkbox'{{if .Config.VotingEnabled}} checked{{end}}>
