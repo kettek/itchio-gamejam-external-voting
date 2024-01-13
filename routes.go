@@ -245,6 +245,52 @@ func setupRoutes() {
 		w.Write(b)
 	})
 
+	// Badge handling
+	r.Get("/badge", func(w http.ResponseWriter, r *http.Request) {
+		if c.VotingFinished {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting finished")
+			return
+		}
+		if !c.VotingEnabled {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting disabled")
+			return
+		}
+
+		q := r.URL.Query()
+		id, err := strconv.Atoi(q.Get("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "empty id")
+			return
+		}
+
+		key := getSessionKey(r)
+		if key == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "missing key")
+			return
+		}
+		user, err := getUserFromKey(key)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+
+		badges, err := getBadges(user.Details, id)
+		if err != nil {
+			if err != ErrMissingGame {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+		}
+
+		fmt.Println(badges)
+	})
+
 	// Admin
 	r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()

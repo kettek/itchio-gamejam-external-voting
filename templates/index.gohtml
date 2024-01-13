@@ -91,6 +91,24 @@
             {{end}}
             {{$ID := .ID}}
             {{if or (and $.VotingEnabled (not (isOwnGame $.User.Details .ID))) $.VotingFinished}}
+              <section class='uniqueBadges'>
+                {{range $.Config.UniqueBadges}}
+                  {{$badge := .}}
+                  <label class='uniqueBadges__entry' data-badge='{{$badge}}'>
+                    <input type='checkbox' class='uniqueBadges__entry__checkbox' data-badge='{{$badge}}' {{if true}}checked{{end}}>
+                    <span class='uniqueBadges__entry__name'>{{$badge}}</span>
+                  </label>
+                {{end}}
+              </section>
+              <section class='badges'>
+                {{range $.Config.Badges}}
+                  {{$badge := .}}
+                  <label class='badges__entry' data-badge='{{$badge}}'>
+                    <input type='checkbox' class='badges__entry__checkbox' data-badge='{{$badge}}' {{if true}}checked{{end}}>
+                    <span class='badges__entry__name'>{{$badge}}</span>
+                  </label>
+                {{end}}
+              </section>
               <section class='ratings'>
                 {{range $.Config.VoteCategories}}
                   {{$key := .}}
