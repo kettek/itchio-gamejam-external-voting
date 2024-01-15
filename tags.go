@@ -29,7 +29,7 @@ func setTags(user UserDetails, gameID int, tags Tags) error {
 			return err
 		}
 
-		err = b.Put([]byte(strconv.Itoa(gameID)+"-tags"), jsonBytes)
+		err = b.Put([]byte("tags-"+strconv.Itoa(gameID)), jsonBytes)
 		return err
 	})
 	return err
@@ -43,7 +43,7 @@ func getTags(user UserDetails, gameID int) (Tags, error) {
 			return ErrMissingBucket
 		}
 
-		jsonBytes := b.Get([]byte(strconv.Itoa(gameID) + "-tags"))
+		jsonBytes := b.Get([]byte("tags-" + strconv.Itoa(gameID)))
 		if jsonBytes == nil {
 			return ErrMissingGame
 		}

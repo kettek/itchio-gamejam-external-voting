@@ -85,7 +85,7 @@ func setVotes(user UserDetails, gameID int, votes Votes) error {
 			return err
 		}
 
-		err = b.Put([]byte(strconv.Itoa(gameID)), jsonBytes)
+		err = b.Put([]byte("votes-"+strconv.Itoa(gameID)), jsonBytes)
 		return err
 	})
 	return err
@@ -99,7 +99,7 @@ func getVotes(user UserDetails, gameID int) (Votes, error) {
 			return ErrMissingBucket
 		}
 
-		jsonBytes := b.Get([]byte(strconv.Itoa(gameID)))
+		jsonBytes := b.Get([]byte("votes-" + strconv.Itoa(gameID)))
 		if jsonBytes == nil {
 			return ErrMissingGame
 		}
@@ -118,7 +118,7 @@ func getFinalVotes(gameID int) (Votes, error) {
 		return tx.ForEach(func(name []byte, b *bbolt.Bucket) error {
 			var userVotes Votes
 			// Only accept valid entries.
-			jsonBytes := b.Get([]byte(strconv.Itoa(gameID)))
+			jsonBytes := b.Get([]byte("votes-" + strconv.Itoa(gameID)))
 			if jsonBytes == nil {
 				return nil
 			}
