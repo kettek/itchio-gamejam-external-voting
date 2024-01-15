@@ -21,6 +21,7 @@ type Config struct {
 	OAuthRedirect  string
 	VotingEnabled  bool
 	VotingFinished bool
+	BaseURL        string
 	VoteCategories []string
 	Badges         []string
 	Tags           []string

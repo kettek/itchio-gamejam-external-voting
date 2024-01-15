@@ -145,7 +145,7 @@ func setupRoutes() {
 		} else {
 			s := session.GetSession(r)
 			s.Set("key", key)
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			http.Redirect(w, r, c.BaseURL+"/", http.StatusSeeOther)
 		}
 	})
 
@@ -455,7 +455,7 @@ func setupRoutes() {
 
 		// TODO: If possible, somehow revoke auth from itch.io. They don't seem to have a proper endpoint for this...
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, c.BaseURL+"/", http.StatusSeeOther)
 	})
 
 	// Static file serving
