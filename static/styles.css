@@ -137,53 +137,54 @@ form {
   margin-bottom: 0.5em;
   display: flex;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: center;
   flex-flow: wrap;
+  font-size: 0.8em;
 }
 
 .tags__entry {
-  margin: 0.1em 0.2em;
+  margin: 0.2em 0.2em;
 }
 
 .tags__entry.-selected .tags__entry__name {
-  color: #eee;
-  background: #444;
-  border-color: #eee
+  color: #224;
+  background: #bbf;
 }
 
 .tags__entry__name {
   text-decoration: none;
   user-select: none;
   padding: 0 0.1em;
-  background: #eee;
+  background: #eef;
   color: #444;
   border: 1px solid #444;
-  border-radius: 0.2em;
+  border-radius: 0.3em;
 }
 
 .badges {
   margin-bottom: 0.5em;
   display: flex;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: center;
   flex-flow: wrap;
 }
 
 .badges__entry {
   position: relative;
-  margin: 0.1em 0.2em;
+  margin: 0.2em 0.2em;
 }
 
 .badges__entry::after {
   position: absolute;
-  top: 0;
-  right: 0;
-  content: '*';
+  pointer-events: none;
+  top: -1ch;
+  right: -1ch;
+  content: '💫';
 }
 
 .badges__entry.-selected .badges__entry__name {
-  color: #eee;
-  background: #444;
+  color: #224;
+  background: #ff9;
   border-color: #eee
 }
 
@@ -194,7 +195,6 @@ form {
   background: #eee;
   color: #444;
   border: 1px solid #444;
-  border-radius: 0.2em;
 }
 
 .ratings__entry {
