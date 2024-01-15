@@ -52,15 +52,15 @@
             <button id='AddBadge'>Add Badge</button>
           </span>
           <hr>
-          {{range $index, $category := .Config.UniqueBadges}}
-            <span class='uniqueBadge'>
-              <input class='UniqueBadges' name='UniqueBadges-{{$index}}' value={{.}}>
-              <button class='RemoveUniqueBadge'>Remove Unique</button>
+          {{range $index, $category := .Config.Tags}}
+            <span class='tag'>
+              <input class='Tags' name='Tags-{{$index}}' value={{.}}>
+              <button class='RemoveTag'>Remove Tag</button>
             </span>
           {{end}}
           <span>
-            <input id='NewUniqueBadge' name='NewUniqueBadge'>
-            <button id='AddUniqueBadge'>Add Unique Badge</button>
+            <input id='NewTag' name='NewTag'>
+            <button id='AddTag'>Add Tag</button>
           </span>
           <hr>
           <label>
@@ -84,29 +84,45 @@
             Login to vote!
           {{else if or $.VotingFinished $.VotingEnabled}}
             {{$votes := ""}}
+            {{$badges := ""}}
+            {{$tags := ""}}
             {{if $.VotingFinished}}
               {{$votes = getFinalVotes .ID}}
+              {{$badges = getBadges $.User.Details .ID}}
+              {{$tags = getTags $.User.Details .ID}}
             {{else}}
               {{$votes = getVotes $.User.Details .ID}}
+              {{$badges = getBadges $.User.Details .ID}}
+              {{$tags = getTags $.User.Details .ID}}
             {{end}}
             {{$ID := .ID}}
             {{if or (and $.VotingEnabled (not (isOwnGame $.User.Details .ID))) $.VotingFinished}}
-              <section class='uniqueBadges'>
-                {{range $.Config.UniqueBadges}}
-                  {{$badge := .}}
-                  <label class='uniqueBadges__entry' data-badge='{{$badge}}'>
-                    <input type='checkbox' class='uniqueBadges__entry__checkbox' data-badge='{{$badge}}' {{if true}}checked{{end}}>
-                    <span class='uniqueBadges__entry__name'>{{$badge}}</span>
-                  </label>
-                {{end}}
-              </section>
               <section class='badges'>
                 {{range $.Config.Badges}}
                   {{$badge := .}}
-                  <label class='badges__entry' data-badge='{{$badge}}'>
-                    <input type='checkbox' class='badges__entry__checkbox' data-badge='{{$badge}}' {{if true}}checked{{end}}>
-                    <span class='badges__entry__name'>{{$badge}}</span>
-                  </label>
+                  {{$value := false}}
+                  {{if index $badges $badge}}
+                    {{$value = index $badges $badge}}
+                  {{end}}
+                  <span class='badges__entry {{if $value}}-selected{{else}}{{end}}' data-badge='{{$badge}}'>
+                    <a href='badge?id={{$ID}}&badge={{$badge}}' class='badges__entry__name'>
+                      {{$badge}}
+                    </a>
+                  </span>
+                {{end}}
+              </section>
+              <section class='tags'>
+                {{range $.Config.Tags}}
+                  {{$tag := .}}
+                  {{$value := false}}
+                  {{if index $tags $tag}}
+                    {{$value = index $tags $tag}}
+                  {{end}}
+                  <span class='tags__entry {{if $value}}-selected{{else}}{{end}}' data-tag='{{$tag}}'>
+                    <a href='tag?id={{$ID}}&tag={{$tag}}' class='tags__entry__name'>
+                      {{$tag}}
+                    </a>
+                  </span>
                 {{end}}
               </section>
               <section class='ratings'>

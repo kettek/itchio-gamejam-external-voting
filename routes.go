@@ -288,7 +288,118 @@ func setupRoutes() {
 			}
 		}
 
-		fmt.Println(badges)
+		badge := q.Get("badge")
+
+		var has bool
+		for _, badge2 := range c.Badges {
+			if badge2 == badge {
+				has = true
+				break
+			}
+		}
+		if !has {
+			// FIXME: Replace with proper err
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "bad badge")
+			return
+		}
+		badges[badge] = !badges[badge]
+
+		returnBadges, err := processBadge(user.Details, id, badges)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+
+		// Return JSON with the user's current badges.
+		b, err := json.Marshal(returnBadges)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(b)
+	})
+
+	// Tag handling
+	r.Get("/tag", func(w http.ResponseWriter, r *http.Request) {
+		if c.VotingFinished {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting finished")
+			return
+		}
+		if !c.VotingEnabled {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting disabled")
+			return
+		}
+
+		q := r.URL.Query()
+		id, err := strconv.Atoi(q.Get("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "empty id")
+			return
+		}
+
+		key := getSessionKey(r)
+		if key == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "missing key")
+			return
+		}
+		user, err := getUserFromKey(key)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+
+		tags, err := getTags(user.Details, id)
+		if err != nil {
+			if err != ErrMissingGame {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+		}
+
+		tag := q.Get("tag")
+
+		var has bool
+		for _, tag2 := range c.Tags {
+			if tag2 == tag {
+				has = true
+				break
+			}
+		}
+		if !has {
+			// FIXME: Replace with proper err
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "bad tag")
+			return
+		}
+
+		tags[tag] = !tags[tag]
+		if err := setTags(user.Details, id, tags); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+
+		// Return JSON with the user's current tags.
+		b, err := json.Marshal(struct {
+			ID   int             `json:"id"`
+			Tags map[string]bool `json:"tags"`
+		}{
+			ID:   id,
+			Tags: tags,
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(b)
 	})
 
 	// Admin

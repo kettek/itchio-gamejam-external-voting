@@ -133,7 +133,7 @@ form {
   opacity: 0.6;
 }
 
-.badges, .uniqueBadges {
+.tags {
   margin-bottom: 0.5em;
   display: flex;
   align-items: flex-start;
@@ -141,27 +141,60 @@ form {
   flex-flow: wrap;
 }
 
-.badges__entry, .uniqueBadges__entry {
+.tags__entry {
   margin: 0.1em 0.2em;
 }
 
-.badges__entry__name, .uniqueBadges__entry__name {
+.tags__entry.-selected .tags__entry__name {
+  color: #eee;
+  background: #444;
+  border-color: #eee
+}
+
+.tags__entry__name {
+  text-decoration: none;
   user-select: none;
   padding: 0 0.1em;
-}
-.badges__entry__checkbox, .uniqueBadges__entry__checkbox {
-  display: none;
-}
-.badges__entry__name, .uniqueBadges__entry__name {
   background: #eee;
   color: #444;
   border: 1px solid #444;
   border-radius: 0.2em;
 }
-.badges__entry__checkbox:checked + .badges__entry__name , .uniqueBadges__entry__checkbox:checked + .uniqueBadges__entry__name {
-  border: 1px solid #eee;
-  background: #444;
+
+.badges {
+  margin-bottom: 0.5em;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-flow: wrap;
+}
+
+.badges__entry {
+  position: relative;
+  margin: 0.1em 0.2em;
+}
+
+.badges__entry::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  content: '*';
+}
+
+.badges__entry.-selected .badges__entry__name {
   color: #eee;
+  background: #444;
+  border-color: #eee
+}
+
+.badges__entry__name {
+  text-decoration: none;
+  user-select: none;
+  padding: 0 0.1em;
+  background: #eee;
+  color: #444;
+  border: 1px solid #444;
+  border-radius: 0.2em;
 }
 
 .ratings__entry {

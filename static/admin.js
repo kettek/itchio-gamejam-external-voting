@@ -18,18 +18,17 @@ window.addEventListener('DOMContentLoaded', () => {
     for (let el of [...document.getElementsByClassName('badge')]) {
       el.parentElement.removeChild(el)
     }
-    for (let el of [...document.getElementsByClassName('uniqueBadge')]) {
+    for (let el of [...document.getElementsByClassName('tag')]) {
       el.parentElement.removeChild(el)
     }
     for (let i = 0; i < o.VoteCategories.length; i++) {
       createVoteCategory('VoteCategories-'+i, o.VoteCategories[i])
     }
-    // Do the same for badges.
     for (let i = 0; i < o.Badges.length; i++) {
       createBadge('Badges-'+i, o.Badges[i])
     }
-    for (let i = 0; i < o.UniqueBadges.length; i++) {
-      createUniqueBadge('UniqueBadges-'+i, o.UniqueBadges[i])
+    for (let i = 0; i < o.Tags.length; i++) {
+      createTag('Tags-'+i, o.Tags[i])
     }
   }
   
@@ -75,24 +74,24 @@ window.addEventListener('DOMContentLoaded', () => {
     )
   }
 
-  const createUniqueBadge = (name, value) => {
+  const createTag = (name, value) => {
     let span = document.createElement('span')
-    span.className = 'uniqueBadge'
+    span.className = 'tag'
     let input = document.createElement('input')
-    input.className = 'UniqueBadges'
+    input.className = 'Tag'
     input.name = name
     input.value = value
     setupElement(input)
     let button = document.createElement('button')
-    button.className = 'RemoveUniqueBadge'
-    button.innerHTML = 'Remove Unique'
-    setupRemoveUniqueBadge(button)
+    button.className = 'RemoveTag'
+    button.innerHTML = 'Remove Tag'
+    setupRemoveTag(button)
     span.appendChild(input)
     span.appendChild(button)
     
-    document.getElementById('NewUniqueBadge').parentElement.parentElement.insertBefore(
+    document.getElementById('NewTag').parentElement.parentElement.insertBefore(
       span,
-      document.getElementById('NewUniqueBadge').parentElement
+      document.getElementById('NewTag').parentElement
     )
   }
   
@@ -145,7 +144,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   
   for (let input of admin.getElementsByTagName('input')) {
-    if (input.name === 'NewVoteCategory' || input.name === 'NewBadge' || input.name === 'NewUniqueBadge') {
+    if (input.name === 'NewVoteCategory' || input.name === 'NewBadge' || input.name === 'NewTag') {
       continue
     }
     setupElement(input)
@@ -180,9 +179,9 @@ window.addEventListener('DOMContentLoaded', () => {
     setupRemoveBadge(button)
   }
 
-  const setupRemoveUniqueBadge = (el) => {
+  const setupRemoveTag = (el) => {
     el.addEventListener('click', async e => {
-      let res = await fetch(`admin?RemoveUniqueBadge=${e.currentTarget.previousElementSibling.name}`)
+      let res = await fetch(`admin?RemoveTag=${e.currentTarget.previousElementSibling.name}`)
       if (res.status === 200) {
         el.parentElement.parentElement.removeChild(el.parentElement)
         const conf = await res.json()
@@ -193,10 +192,10 @@ window.addEventListener('DOMContentLoaded', () => {
     })
   }
 
-  document.getElementById('AddUniqueBadge')?.addEventListener('click', async e => {
-    let res = await fetch(`admin?AddUniqueBadge=${document.getElementById('NewUniqueBadge').value}`)
+  document.getElementById('AddTag')?.addEventListener('click', async e => {
+    let res = await fetch(`admin?AddTag=${document.getElementById('NewTag').value}`)
     if (res.status === 200) {
-      document.getElementById('NewUniqueBadge').value = ''
+      document.getElementById('NewTag').value = ''
       
       const conf = await res.json()
       setAdminConfig(conf)
@@ -205,7 +204,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  for (let button of admin.getElementsByClassName('RemoveUniqueBadge')) {
-    setupRemoveUniqueBadge(button)
+  for (let button of admin.getElementsByClassName('RemoveTag')) {
+    setupRemoveTag(button)
   }
 })

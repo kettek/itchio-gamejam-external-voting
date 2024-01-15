@@ -14,6 +14,14 @@ func loadTemplates() *template.Template {
 			votes, _ := getVotes(user, id)
 			return votes
 		},
+		"getBadges": func(user UserDetails, id int) Badges {
+			badges, _ := getBadges(user, id)
+			return badges
+		},
+		"getTags": func(user UserDetails, id int) Tags {
+			tags, _ := getTags(user, id)
+			return tags
+		},
 		"iterate": func(count int) []int {
 			var stars []int
 			for i := 0; i < count; i++ {

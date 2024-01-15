@@ -23,7 +23,7 @@ type Config struct {
 	VotingFinished bool
 	VoteCategories []string
 	Badges         []string
-	UniqueBadges   []string
+	Tags           []string
 	Admins         []UserInfo `json:",omitempty"`
 }
 
@@ -118,6 +118,25 @@ func setConfig(key string, value string) error {
 			c.VoteCategories = append(c.VoteCategories[:i], c.VoteCategories[i+1:]...)
 			c.original.VoteCategories = append(c.original.VoteCategories[:i], c.original.VoteCategories[i+1:]...)
 		}
+	case "AddTag":
+		c.Tags = append(c.Tags, value)
+		c.original.Tags = append(c.original.Tags, value)
+	case "RemoveTag":
+		if strings.HasPrefix(value, "Tags-") {
+			parts := strings.Split(value, "-")
+			if len(parts) != 2 {
+				return errors.New("bad tag index")
+			}
+			i, err := strconv.Atoi(parts[1])
+			if err != nil {
+				return errors.New("bad tag index")
+			}
+			if i < 0 || i >= len(c.Tags) {
+				return errors.New("bad tag index")
+			}
+			c.Tags = append(c.Tags[:i], c.Tags[i+1:]...)
+			c.original.Tags = append(c.original.Tags[:i], c.original.Tags[i+1:]...)
+		}
 	case "AddBadge":
 		c.Badges = append(c.Badges, value)
 		c.original.Badges = append(c.original.Badges, value)
@@ -136,25 +155,6 @@ func setConfig(key string, value string) error {
 			}
 			c.Badges = append(c.Badges[:i], c.Badges[i+1:]...)
 			c.original.Badges = append(c.original.Badges[:i], c.original.Badges[i+1:]...)
-		}
-	case "AddUniqueBadge":
-		c.UniqueBadges = append(c.UniqueBadges, value)
-		c.original.UniqueBadges = append(c.original.UniqueBadges, value)
-	case "RemoveUniqueBadge":
-		if strings.HasPrefix(value, "UniqueBadges-") {
-			parts := strings.Split(value, "-")
-			if len(parts) != 2 {
-				return errors.New("bad unique badge index")
-			}
-			i, err := strconv.Atoi(parts[1])
-			if err != nil {
-				return errors.New("bad unique badge index")
-			}
-			if i < 0 || i >= len(c.UniqueBadges) {
-				return errors.New("bad unique badge index")
-			}
-			c.UniqueBadges = append(c.UniqueBadges[:i], c.UniqueBadges[i+1:]...)
-			c.original.UniqueBadges = append(c.original.UniqueBadges[:i], c.original.UniqueBadges[i+1:]...)
 		}
 	default:
 		if strings.HasPrefix(key, "VoteCategories-") {
