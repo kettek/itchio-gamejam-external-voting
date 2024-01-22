@@ -41,5 +41,7 @@ func main() {
 	setupRoutes()
 
 	// And listen!
-	http.ListenAndServe(c.Address, r)
+	if err := http.ListenAndServe(c.Address, r); err != nil {
+		panic(err)
+	}
 }
