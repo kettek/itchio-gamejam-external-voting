@@ -40,7 +40,7 @@ func loadConfig() Config {
 			if err != nil {
 				panic(err)
 			}
-			if err := ioutil.WriteFile("config.json", b, 644); err != nil {
+			if err := os.WriteFile("config.json", b, 0644); err != nil {
 				panic(err)
 			}
 			f, err = os.Open("config.json")
