@@ -141,10 +141,6 @@ func getFinalVotes(gameID int) (Votes, error) {
 		votes[k] /= v
 	}
 
-	for k, v := range votes {
-		votes[k] = math.Round(v*100) / 100
-	}
-
 	// TODO: Disregard votes that the given game doesn't want to participate in.
 	count := len(votes)
 	total := 0.0
@@ -158,6 +154,10 @@ func getFinalVotes(gameID int) (Votes, error) {
 	}
 	total /= float64(count)
 	votes["TOTAL"] = total
+
+	for k, v := range votes {
+		votes[k] = math.Round(v*100) / 100
+	}
 
 	return votes, err
 }
