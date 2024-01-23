@@ -77,6 +77,8 @@
       <section></section>
     {{end}}
     <section class='entries'>
+      {{$finalBadges := getFinalBadges}}
+      {{$finalTags := getFinalTags}}
       {{range .Entries.Games}}
         <article class='entry' data-id={{.ID}}>
           {{template "entry" .}}
@@ -88,8 +90,8 @@
             {{$tags := ""}}
             {{if $.VotingFinished}}
               {{$votes = getFinalVotes .ID}}
-              {{$badges = getBadges $.User.Details .ID}}
-              {{$tags = getTags $.User.Details .ID}}
+              {{$badges = getActualFinalBadges $finalBadges .ID}}
+              {{$tags = getActualFinalTags $finalTags .ID}}
             {{else}}
               {{$votes = getVotes $.User.Details .ID}}
               {{$badges = getBadges $.User.Details .ID}}
