@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"strconv"
 
@@ -53,4 +54,56 @@ func getTags(user UserDetails, gameID int) (Tags, error) {
 		return nil
 	})
 	return tags, err
+}
+
+type TagResults map[string][]int
+
+func getFinalTags() TagResults {
+	results := make(TagResults)
+	counts := make(map[string]map[int]int)
+	db.View(func(tx *bbolt.Tx) error {
+		tx.ForEach(func(name []byte, b *bbolt.Bucket) error {
+			c := b.Cursor()
+			prefix := []byte("tags-")
+			for k, v := c.Seek(prefix); k != nil && bytes.HasPrefix(k, prefix); k, v = c.Next() {
+				id, err := strconv.Atoi(string(k[len(prefix):]))
+				if err != nil {
+					return err
+				}
+				tags := Tags{}
+				if err := json.Unmarshal(v, &tags); err != nil {
+					return err
+				}
+				for k, v := range tags {
+					if v {
+						if _, ok := counts[k]; !ok {
+							counts[k] = make(map[int]int)
+						}
+						counts[k][id]++
+					}
+				}
+			}
+			return nil
+		})
+		return nil
+	})
+
+	// Collect the highest rated counts.
+	for k, v := range counts {
+		for _, count := range v {
+			for id2, count2 := range v {
+				if count2 < count {
+					delete(counts[k], id2)
+				}
+			}
+		}
+	}
+
+	for k, v := range counts {
+		for id := range v {
+			results[k] = append(results[k], id)
+		}
+	}
+
+	return results
 }

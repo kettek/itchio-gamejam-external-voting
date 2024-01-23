@@ -18,8 +18,36 @@ func loadTemplates() *template.Template {
 			badges, _ := getBadges(user, id)
 			return badges
 		},
+		"getFinalBadges": func() BadgeResults {
+			return getFinalBadges()
+		},
+		"getActualFinalBadges": func(results BadgeResults, id int) map[string]bool {
+			badges := make(map[string]bool)
+			for k, v := range results {
+				for _, v2 := range v {
+					if v2 == id {
+						badges[k] = true
+					}
+				}
+			}
+			return badges
+		},
 		"getTags": func(user UserDetails, id int) Tags {
 			tags, _ := getTags(user, id)
+			return tags
+		},
+		"getFinalTags": func() TagResults {
+			return getFinalTags()
+		},
+		"getActualFinalTags": func(results TagResults, id int) Tags {
+			tags := make(Tags)
+			for k, v := range results {
+				for _, v2 := range v {
+					if v2 == id {
+						tags[k] = true
+					}
+				}
+			}
 			return tags
 		},
 		"iterate": func(count int) []int {
