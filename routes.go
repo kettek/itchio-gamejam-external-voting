@@ -13,6 +13,8 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
+	"sync"
 
 	"github.com/fogleman/gg"
 	bolt "go.etcd.io/bbolt"
@@ -264,7 +266,6 @@ func setupRoutes() {
 			fmt.Fprintf(w, "bad id")
 			return
 		}
-		// big ol' FIXME: Cache this crap!
 		w.Header().Set("Content-Type", "image/png")
 		badges := getFinalBadges()
 		for k, v := range badges {
@@ -273,17 +274,8 @@ func setupRoutes() {
 			}
 			for _, v2 := range v {
 				if v2 == id {
-					dc := gg.NewContext(c.Badge.Width, c.Badge.Height)
-					if fontFace != nil {
-						dc.SetFontFace(fontFace)
-					}
-
-					dc.DrawImage(badgeImage, 0, 0)
-
-					dc.SetRGB(0, 0, 0)
-					dc.DrawStringAnchored(k, float64(c.Badge.TextX), float64(c.Badge.TextY), 0.5, 0.5)
-					dc.EncodePNG(w)
-
+					w.Header().Set("Content-Type", "image/png")
+					w.Write(generateBadge(k))
 					return
 				}
 			}
@@ -315,29 +307,8 @@ func setupRoutes() {
 				}
 			}
 		}
-		if len(tagStrings) > 0 {
-			w.Header().Set("Content-Type", "image/png")
-			dc := gg.NewContext(c.Tag.Width*len(tagStrings)+c.Tag.Width/8*(len(tagStrings)-1), c.Tag.Height)
-			if fontFace != nil {
-				dc.SetFontFace(fontFace)
-			}
-			x := 0
-			for _, tag := range tagStrings {
-				if s, ok := c.Badge.Rewrites[tag]; ok {
-					tag = s
-				}
-
-				dc.DrawImage(tagImage, x, 0)
-				dc.SetRGB(0, 0, 0)
-				dc.DrawStringAnchored(tag, float64(c.Tag.TextX)+float64(x), float64(c.Tag.TextY), 0.5, 0.5)
-				x += c.Tag.Width + c.Tag.Width/8
-			}
-			dc.EncodePNG(w)
-		} else {
-			w.Header().Set("Content-Type", "image/png")
-			dc := gg.NewContext(1, 1)
-			dc.EncodePNG(w)
-		}
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(generateTags(tagStrings))
 	})
 
 	// Badge handling
@@ -591,4 +562,82 @@ func loadCustom() {
 	if err != nil {
 		fmt.Println("badge", err)
 	}
+}
+
+var badgeLock sync.Mutex
+var badgeImages map[string][]byte = make(map[string][]byte)
+
+func generateBadge(text string) []byte {
+	badgeLock.Lock()
+	defer badgeLock.Unlock()
+
+	if r, ok := badgeImages[text]; ok {
+		return r
+	}
+
+	if text == "" {
+		dc := gg.NewContext(1, 1)
+		w := new(bytes.Buffer)
+		dc.EncodePNG(w)
+		badgeImages[text] = w.Bytes()
+		return badgeImages[text]
+	}
+	dc := gg.NewContext(c.Badge.Width, c.Badge.Height)
+	if fontFace != nil {
+		dc.SetFontFace(fontFace)
+	}
+
+	dc.DrawImage(badgeImage, 0, 0)
+
+	dc.SetRGB(0, 0, 0)
+	dc.DrawStringAnchored(text, float64(c.Badge.TextX), float64(c.Badge.TextY), 0.5, 0.5)
+
+	w := new(bytes.Buffer)
+	dc.EncodePNG(w)
+	badgeImages[text] = w.Bytes()
+	return badgeImages[text]
+}
+
+var tagLock sync.Mutex
+var tagImages map[string][]byte = make(map[string][]byte)
+
+func generateTags(tags []string) []byte {
+	tagLock.Lock()
+	defer tagLock.Unlock()
+
+	tagKey := strings.Join(tags, "+")
+
+	if r, ok := tagImages[tagKey]; ok {
+		return r
+	}
+
+	if len(tags) == 0 {
+		dc := gg.NewContext(1, 1)
+		w := new(bytes.Buffer)
+		dc.EncodePNG(w)
+		tagImages[tagKey] = w.Bytes()
+		return tagImages[tagKey]
+	}
+
+	dc := gg.NewContext(c.Tag.Width*len(tags)+c.Tag.Width/8*(len(tags)-1), c.Tag.Height)
+	if fontFace != nil {
+		dc.SetFontFace(fontFace)
+	}
+	x := 0
+	for _, tag := range tags {
+		if s, ok := c.Badge.Rewrites[tag]; ok {
+			tag = s
+		}
+
+		dc.DrawImage(tagImage, x, 0)
+		dc.SetRGB(0, 0, 0)
+		dc.DrawStringAnchored(tag, float64(c.Tag.TextX)+float64(x), float64(c.Tag.TextY), 0.5, 0.5)
+		x += c.Tag.Width + c.Tag.Width/8
+	}
+
+	w := new(bytes.Buffer)
+
+	dc.EncodePNG(w)
+	tagImages[tagKey] = w.Bytes()
+	return tagImages[tagKey]
 }
