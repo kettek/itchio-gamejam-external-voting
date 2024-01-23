@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 )
 
@@ -56,6 +57,9 @@ func loadTemplates() *template.Template {
 				stars = append(stars, i+1)
 			}
 			return stars
+		},
+		"niceFloat": func(f float64) string {
+			return fmt.Sprintf("%04.2f", f)
 		},
 		"starSet": func(cat float64, v int) bool {
 			return cat >= float64(v)

@@ -155,7 +155,7 @@
                         </a>
                       {{end}}
                     </section>
-                    <span class='ratings__entry__number' data-category='{{$key}}'>{{$value}}</span>
+                    <span class='ratings__entry__number' data-category='{{$key}}'>{{if $.VotingFinished}}{{niceFloat $value}}{{else}}{{$value}}{{end}}</span>
                   </article>
                 {{end}}
                 {{range $.Config.VoteCategories}}
@@ -173,7 +173,7 @@
                         </a>
                       {{end}}
                     </section>
-                    <span class='ratings__entry__number' data-category='{{$key}}'>{{$value}}</span>
+                    <span class='ratings__entry__number' data-category='{{$key}}'>{{if $.VotingFinished}}{{niceFloat $value}}{{else}}{{$value}}{{end}}</span>
                   </article>
                 {{end}}
               </section>
