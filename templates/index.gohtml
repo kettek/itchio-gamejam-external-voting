@@ -98,33 +98,45 @@
               {{$tags = getTags $.User.Details .ID}}
             {{end}}
             {{$ID := .ID}}
+            <section class='entry__accolades'>
+              {{if $.VotingFinished}}
+                <img class='entry__badge' src='badge/{{.ID}}'>
+                <img class='entry__tags' src='tags/{{.ID}}'>
+              {{end}}
+            </section>
             {{if or (and $.VotingEnabled (not (isOwnGame $.User.Details .ID))) $.VotingFinished}}
               <section class='badges'>
-                {{range $.Config.Badges}}
-                  {{$badge := .}}
-                  {{$value := false}}
-                  {{if index $badges $badge}}
-                    {{$value = index $badges $badge}}
+                {{if $.VotingFinished}}
+                {{else}}
+                  {{range $.Config.Badges}}
+                    {{$badge := .}}
+                    {{$value := false}}
+                    {{if index $badges $badge}}
+                      {{$value = index $badges $badge}}
+                    {{end}}
+                    <span class='badges__entry {{if $value}}-selected{{else}}{{end}}' data-badge='{{$badge}}'>
+                      <a href='badge?id={{$ID}}&badge={{$badge}}' class='badges__entry__name'>
+                        {{$badge}}
+                      </a>
+                    </span>
                   {{end}}
-                  <span class='badges__entry {{if $value}}-selected{{else}}{{end}}' data-badge='{{$badge}}'>
-                    <a href='badge?id={{$ID}}&badge={{$badge}}' class='badges__entry__name'>
-                      {{$badge}}
-                    </a>
-                  </span>
                 {{end}}
               </section>
               <section class='tags'>
-                {{range $.Config.Tags}}
-                  {{$tag := .}}
-                  {{$value := false}}
-                  {{if index $tags $tag}}
-                    {{$value = index $tags $tag}}
+                {{if $.VotingFinished}}
+                {{else}}
+                  {{range $.Config.Tags}}
+                    {{$tag := .}}
+                    {{$value := false}}
+                    {{if index $tags $tag}}
+                      {{$value = index $tags $tag}}
+                    {{end}}
+                    <span class='tags__entry {{if $value}}-selected{{else}}{{end}}' data-tag='{{$tag}}'>
+                      <a href='tag?id={{$ID}}&tag={{$tag}}' class='tags__entry__name'>
+                        {{$tag}}
+                      </a>
+                    </span>
                   {{end}}
-                  <span class='tags__entry {{if $value}}-selected{{else}}{{end}}' data-tag='{{$tag}}'>
-                    <a href='tag?id={{$ID}}&tag={{$tag}}' class='tags__entry__name'>
-                      {{$tag}}
-                    </a>
-                  </span>
                 {{end}}
               </section>
               <section class='ratings'>

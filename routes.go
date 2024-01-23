@@ -265,12 +265,11 @@ func setupRoutes() {
 			return
 		}
 		// big ol' FIXME: Cache this crap!
+		w.Header().Set("Content-Type", "image/png")
 		badges := getFinalBadges()
 		for k, v := range badges {
 			for _, v2 := range v {
 				if v2 == id {
-					w.Header().Set("Content-Type", "image/png")
-
 					dc := gg.NewContext(c.Badge.Width, c.Badge.Height)
 					if fontFace != nil {
 						dc.SetFontFace(fontFace)
@@ -286,7 +285,8 @@ func setupRoutes() {
 				}
 			}
 		}
-		w.WriteHeader(http.StatusNotFound)
+		dc := gg.NewContext(1, 1)
+		dc.EncodePNG(w)
 	})
 
 	r.Get("/tags/*", func(w http.ResponseWriter, r *http.Request) {
@@ -327,7 +327,9 @@ func setupRoutes() {
 			}
 			dc.EncodePNG(w)
 		} else {
-			w.WriteHeader(http.StatusNotFound)
+			w.Header().Set("Content-Type", "image/png")
+			dc := gg.NewContext(1, 1)
+			dc.EncodePNG(w)
 		}
 	})
 
