@@ -31,16 +31,18 @@ type Config struct {
 	FontSize float64
 	//
 	Badge struct {
-		Width  int
-		Height int
-		TextX  int
-		TextY  int
+		Width    int
+		Height   int
+		TextX    int
+		TextY    int
+		Rewrites map[string]string
 	}
 	Tag struct {
-		Width  int
-		Height int
-		TextX  int
-		TextY  int
+		Width    int
+		Height   int
+		TextX    int
+		TextY    int
+		Rewrites map[string]string
 	}
 }
 

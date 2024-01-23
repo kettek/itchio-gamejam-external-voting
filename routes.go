@@ -268,6 +268,9 @@ func setupRoutes() {
 		w.Header().Set("Content-Type", "image/png")
 		badges := getFinalBadges()
 		for k, v := range badges {
+			if s, ok := c.Badge.Rewrites[k]; ok {
+				k = s
+			}
 			for _, v2 := range v {
 				if v2 == id {
 					dc := gg.NewContext(c.Badge.Width, c.Badge.Height)
@@ -320,6 +323,10 @@ func setupRoutes() {
 			}
 			x := 0
 			for _, tag := range tagStrings {
+				if s, ok := c.Badge.Rewrites[tag]; ok {
+					tag = s
+				}
+
 				dc.DrawImage(tagImage, x, 0)
 				dc.SetRGB(0, 0, 0)
 				dc.DrawStringAnchored(tag, float64(c.Tag.TextX)+float64(x), float64(c.Tag.TextY), 0.5, 0.5)
