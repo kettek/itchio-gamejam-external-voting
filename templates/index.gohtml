@@ -128,6 +128,24 @@
                 {{end}}
               </section>
               <section class='ratings'>
+                {{if $.VotingFinished}}
+                  {{$key := "TOTAL"}}
+                  {{$value := 0.0}}
+                  {{if index $votes $key}}
+                    {{$value = index $votes $key}}
+                  {{end}}
+                  <article class='ratings__entry'>
+                    <header>{{$key}}</header>
+                    <section class='ratings__entry__stars' data-category='{{$key}}'>
+                      {{range $v := iterate 5}}
+                        <a href='vote?id={{$ID}}&{{$key}}={{$v}}'>
+                          {{if starSet $value $v}} ★ {{else}} ☆ {{end}}
+                        </a>
+                      {{end}}
+                    </section>
+                    <span class='ratings__entry__number' data-category='{{$key}}'>{{$value}}</span>
+                  </article>
+                {{end}}
                 {{range $.Config.VoteCategories}}
                   {{$key := .}}
                   {{$value := 0.0}}
