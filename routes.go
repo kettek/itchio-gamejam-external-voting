@@ -1,16 +1,22 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
 	"strconv"
 
+	"github.com/fogleman/gg"
 	bolt "go.etcd.io/bbolt"
+	"golang.org/x/image/font"
 
 	"gitea.com/go-chi/session"
 )
@@ -245,6 +251,86 @@ func setupRoutes() {
 		w.Write(b)
 	})
 
+	r.Get("/badge/*", func(w http.ResponseWriter, r *http.Request) {
+		if !c.VotingFinished {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting not finished")
+			return
+		}
+		part := r.URL.Path[len("/badge/"):]
+		id, err := strconv.Atoi(part)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "bad id")
+			return
+		}
+		// big ol' FIXME: Cache this crap!
+		badges := getFinalBadges()
+		for k, v := range badges {
+			for _, v2 := range v {
+				if v2 == id {
+					w.Header().Set("Content-Type", "image/png")
+
+					dc := gg.NewContext(c.Badge.Width, c.Badge.Height)
+					if fontFace != nil {
+						dc.SetFontFace(fontFace)
+					}
+
+					dc.DrawImage(badgeImage, 0, 0)
+
+					dc.SetRGB(0, 0, 0)
+					dc.DrawStringAnchored(k, float64(c.Badge.TextX), float64(c.Badge.TextY), 0.5, 0.5)
+					dc.EncodePNG(w)
+
+					return
+				}
+			}
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	r.Get("/tags/*", func(w http.ResponseWriter, r *http.Request) {
+		if !c.VotingFinished {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting not finished")
+			return
+		}
+		part := r.URL.Path[len("/tags/"):]
+		id, err := strconv.Atoi(part)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "bad id")
+			return
+		}
+		// big ol' FIXME: Cache this crap!
+		tags := getFinalTags()
+		var tagStrings []string
+		for k, v := range tags {
+			for _, v2 := range v {
+				if v2 == id {
+					tagStrings = append(tagStrings, k)
+				}
+			}
+		}
+		if len(tagStrings) > 0 {
+			w.Header().Set("Content-Type", "image/png")
+			dc := gg.NewContext(c.Tag.Width*len(tagStrings)+c.Tag.Width/8*(len(tagStrings)-1), c.Tag.Height)
+			if fontFace != nil {
+				dc.SetFontFace(fontFace)
+			}
+			x := 0
+			for _, tag := range tagStrings {
+				dc.DrawImage(tagImage, x, 0)
+				dc.SetRGB(0, 0, 0)
+				dc.DrawStringAnchored(tag, float64(c.Tag.TextX)+float64(x), float64(c.Tag.TextY), 0.5, 0.5)
+				x += c.Tag.Width + c.Tag.Width/8
+			}
+			dc.EncodePNG(w)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+		}
+	})
+
 	// Badge handling
 	r.Get("/badge", func(w http.ResponseWriter, r *http.Request) {
 		if c.VotingFinished {
@@ -462,4 +548,38 @@ func setupRoutes() {
 	fileServer := http.FileServer(http.Dir("./static"))
 	r.Handle("/*", fileServer)
 
+}
+
+// FIXME: Move this.
+var badgeImage image.Image
+var tagImage image.Image
+var fontFace font.Face
+
+func loadCustom() {
+	if c.Font != "" {
+		stat, err := os.Stat(path.Join("custom", c.Font))
+		if os.IsExist(err) || stat != nil {
+			ff, err := gg.LoadFontFace(path.Join("custom", c.Font), c.FontSize)
+			if err != nil {
+				panic(err)
+			}
+			fontFace = ff
+		}
+	}
+	b, err := os.ReadFile("custom/badge.png")
+	if err != nil {
+		fmt.Println("badge", err)
+	}
+	badgeImage, _, err = image.Decode(bytes.NewReader(b))
+	if err != nil {
+		fmt.Println("badge", err)
+	}
+	b, err = os.ReadFile("custom/tag.png")
+	if err != nil {
+		fmt.Println("badge", err)
+	}
+	tagImage, _, err = image.Decode(bytes.NewReader(b))
+	if err != nil {
+		fmt.Println("badge", err)
+	}
 }

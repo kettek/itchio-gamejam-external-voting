@@ -23,6 +23,9 @@ func main() {
 	db = loadDB()
 	defer db.Close()
 
+	// Load badges, font, etc.
+	loadCustom()
+
 	// Get our game jam info if we have a game jam and are missing any pertinent fields.
 	loadJamInfo()
 

@@ -26,6 +26,22 @@ type Config struct {
 	Badges         []string
 	Tags           []string
 	Admins         []UserInfo `json:",omitempty"`
+	//
+	Font     string
+	FontSize float64
+	//
+	Badge struct {
+		Width  int
+		Height int
+		TextX  int
+		TextY  int
+	}
+	Tag struct {
+		Width  int
+		Height int
+		TextX  int
+		TextY  int
+	}
 }
 
 func loadConfig() Config {
