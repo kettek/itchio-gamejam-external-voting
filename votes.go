@@ -143,8 +143,16 @@ func getFinalVotes(gameID int) (Votes, error) {
 
 	// TODO: Disregard votes that the given game doesn't want to participate in.
 	count := len(votes)
+	// Remove theme from count. TODO: Make this optional.
+	if _, ok := votes["Theme"]; ok {
+		count--
+	}
 	total := 0.0
-	for _, v := range votes {
+	for k, v := range votes {
+		// Skip theme. TODO: Make this optional.
+		if k == "Theme" {
+			continue
+		}
 		// Only consider non-zero votes valid.
 		if v > 0 {
 			total += v
