@@ -44,6 +44,13 @@ type Config struct {
 		TextY    int
 		Rewrites map[string]string
 	}
+	Cat struct {
+		Width    int
+		Height   int
+		TextX    int
+		TextY    int
+		Rewrites map[string]string
+	}
 }
 
 func loadConfig() Config {

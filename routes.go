@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -311,6 +312,36 @@ func setupRoutes() {
 		w.Write(generateTags(tagStrings))
 	})
 
+	r.Get("/cats/*", func(w http.ResponseWriter, r *http.Request) {
+		if !c.VotingFinished {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "voting not finished")
+			return
+		}
+		part := r.URL.Path[len("/cats/"):]
+		id, err := strconv.Atoi(part)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "bad id")
+			return
+		}
+		// big ol' FIXME: Cache this crap!
+		cats := getTopCats()
+		var myCats []CatResult
+		for _, cat := range cats {
+			if cat.id == id {
+				myCats = append(myCats, cat)
+			}
+		}
+		sort.Sort(CatResults(myCats))
+		var catStrings []string
+		for _, cat := range myCats {
+			catStrings = append(catStrings, cat.cat)
+		}
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(generateCats(catStrings))
+	})
+
 	// Badge handling
 	r.Get("/badge", func(w http.ResponseWriter, r *http.Request) {
 		if c.VotingFinished {
@@ -533,6 +564,7 @@ func setupRoutes() {
 // FIXME: Move this.
 var badgeImage image.Image
 var tagImage image.Image
+var catImage image.Image
 var fontFace font.Face
 
 func loadCustom() {
@@ -561,6 +593,14 @@ func loadCustom() {
 	tagImage, _, err = image.Decode(bytes.NewReader(b))
 	if err != nil {
 		fmt.Println("badge", err)
+	}
+	b, err = os.ReadFile("custom/cat.png")
+	if err != nil {
+		fmt.Println("cat", err)
+	}
+	catImage, _, err = image.Decode(bytes.NewReader(b))
+	if err != nil {
+		fmt.Println("cat", err)
 	}
 }
 
@@ -640,4 +680,49 @@ func generateTags(tags []string) []byte {
 	dc.EncodePNG(w)
 	tagImages[tagKey] = w.Bytes()
 	return tagImages[tagKey]
+}
+
+var catLock sync.Mutex
+var catImages map[string][]byte = make(map[string][]byte)
+
+func generateCats(cats []string) []byte {
+	catLock.Lock()
+	defer catLock.Unlock()
+
+	catKey := strings.Join(cats, "+")
+
+	if r, ok := catImages[catKey]; ok {
+		return r
+	}
+
+	if len(cats) == 0 {
+		dc := gg.NewContext(1, 1)
+		w := new(bytes.Buffer)
+		dc.EncodePNG(w)
+		catImages[catKey] = w.Bytes()
+		return catImages[catKey]
+	}
+
+	dc := gg.NewContext(c.Cat.Width*len(cats)+c.Cat.Width/8*(len(cats)-1), c.Cat.Height)
+	if fontFace != nil {
+		dc.SetFontFace(fontFace)
+	}
+
+	x := 0
+	for _, cat := range cats {
+		if s, ok := c.Cat.Rewrites[cat]; ok {
+			cat = s
+		}
+
+		dc.DrawImage(catImage, x, 0)
+		dc.SetRGB(0, 0, 0)
+		dc.DrawStringAnchored(cat, float64(c.Cat.TextX)+float64(x), float64(c.Cat.TextY), 0.5, 0.5)
+		x += c.Cat.Width + c.Cat.Width/8
+	}
+
+	w := new(bytes.Buffer)
+
+	dc.EncodePNG(w)
+	catImages[catKey] = w.Bytes()
+	return catImages[catKey]
 }
